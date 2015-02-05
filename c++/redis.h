@@ -39,6 +39,7 @@ class Redis
 		std::string get(std::string key)
 		{
 			this->_reply = (redisReply*)redisCommand(this->_connect, "GET %s", key.c_str());
+			std::cout << "------:" << this->_reply->len << std::endl;
 			std::string str = this->_reply->str;
 			freeReplyObject(this->_reply);
 			return str;
