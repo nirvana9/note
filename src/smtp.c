@@ -21,7 +21,7 @@
 #include "base64.h"
 #include <curl/curl.h>
 
-#define POSTURL "https://apitest.wecomics.cn/jsonrpc/apicheck.json"
+#define POSTURL "https://api-nienie.wecomics.cn/jsonrpc/apicheck.json"
 #define POSTFIELDS "tested=1"
 #define FILENAME "curlposttest.log"
 
@@ -572,7 +572,7 @@ int sendmail()
 	return 0;
 }
 
-int main(int argc, char *argv[]) {
+int smtp() {
 	CURL *curl;
 	CURLcode res;
 	FILE *fptr;
@@ -595,7 +595,24 @@ int main(int argc, char *argv[]) {
 	curl_easy_setopt(curl, CURLOPT_HEADER, 1);
 	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
 	res = curl_easy_perform(curl);
+	if(res != 0)
+	{
+		sendmail();
+	}
+	fclose(fptr);
 	curl_easy_cleanup(curl);
+	return 0;
+}
+
+int main(int argc, char** argv)
+{
+	while(1)
+	{
+		smtp();
+		sleep(1800);
+	}
+
+	return 0;
 }
 
 size_t write_data(void *buffer, size_t size, size_t nmemb, void *userp) {
