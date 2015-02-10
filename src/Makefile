@@ -1,10 +1,10 @@
 all: smtp
 
 smtp: smtp.o base64.o
-	gcc smtp.o base64.o -g -o smtp
+	gcc smtp.o base64.o -g -o smtp -lcurl
 
 smtp.o: smtp.c
-	gcc -c smtp.c
+	gcc -c smtp.c 
 
 base64.o: base64.c
 	gcc -c base64.c

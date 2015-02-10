@@ -19,6 +19,13 @@
 #include <netdb.h>
 #include "smtp.h"
 #include "base64.h"
+#include <curl/curl.h>
+
+#define POSTURL "https://apitest.wecomics.cn/jsonrpc/apicheck.json"
+#define POSTFIELDS "tested=1"
+#define FILENAME "curlposttest.log"
+
+size_t write_data(void *buffer, size_t size, size_t nmemb, void *userp);
 
 int stringCut(const unsigned char *pcSrc, const unsigned char *start, const unsigned char *end, unsigned char *pcDest)
 {
@@ -525,22 +532,17 @@ int mailEnd(unsigned char **mail)
 	return 0;
 }
 
-int main(int argc, char *argv[])
+int sendmail()
 {
-	if (argc != 5)
-	{
-		printf("Usage: ./smtp [message] [fromaddr] [passwd] [toaddr]\n");
-		exit(-1);
-	}
 	int fd = 0, ret;
 	unsigned char *mail = NULL;
-	const unsigned char *filePath = "./test.jpg";
+//	const unsigned char *filePath = "./test.jpg";
 	const unsigned char *mailSubject = "server error.";
-	const unsigned char *mailBody = argv[1];
+	const unsigned char *mailBody = "apiserver error";
 
-	const unsigned char *fromMailAddr= argv[2];
-	const unsigned char *mailPasswd= argv[3];
-	const unsigned char *toMailAddr= argv[4];
+	const unsigned char *fromMailAddr= "3063535418@qq.com";
+	const unsigned char *mailPasswd= "songjian23";
+	const unsigned char *toMailAddr= "594250682@qq.com";
 	const unsigned char *smtpUrl = "smtp.qq.com";
 
 	mail = calloc(1, 1);
@@ -567,9 +569,37 @@ int main(int argc, char *argv[])
 
 	printf("send OK ...\r\n");
 
-	free(mail);
-
 	return 0;
 }
 
+int main(int argc, char *argv[]) {
+	CURL *curl;
+	CURLcode res;
+	FILE *fptr;
+	struct curl_slist *http_header = NULL;
+
+	if ((fptr = fopen(FILENAME, "w")) == NULL) {
+		fprintf(stderr, "fopen file error: %s\n", FILENAME);
+		exit(1);
+	}
+
+	curl = curl_easy_init();
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0);
+	curl_easy_setopt(curl, CURLOPT_URL, POSTURL);
+	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, POSTFIELDS);
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, fptr);
+	curl_easy_setopt(curl, CURLOPT_POST, 1);
+	curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
+	curl_easy_setopt(curl, CURLOPT_HEADER, 1);
+	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
+	res = curl_easy_perform(curl);
+	curl_easy_cleanup(curl);
+}
+
+size_t write_data(void *buffer, size_t size, size_t nmemb, void *userp) {
+	FILE *fptr = (FILE*)userp;
+	fwrite(buffer, size, nmemb, fptr);
+}
 

@@ -1,0 +1,4 @@
+fuser -km /home/louis
+umount /home/louis
+fsck /dev/vdb
+mount /dev/vdb /home/louis
