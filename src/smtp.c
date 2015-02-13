@@ -532,7 +532,7 @@ int mailEnd(unsigned char **mail)
 	return 0;
 }
 
-int sendmail()
+int sendmail(char *p)
 {
 	int fd = 0, ret;
 	unsigned char *mail = NULL;
@@ -542,7 +542,8 @@ int sendmail()
 
 	const unsigned char *fromMailAddr= "3063535418@qq.com";
 	const unsigned char *mailPasswd= "songjian23";
-	const unsigned char *toMailAddr= "594250682@qq.com";
+//	const unsigned char *toMailAddr= "594250682@qq.com";
+	const unsigned char *toMailAddr= p;
 	const unsigned char *smtpUrl = "smtp.qq.com";
 
 	mail = calloc(1, 1);
@@ -569,18 +570,20 @@ int sendmail()
 
 	printf("send OK ...\r\n");
 
+	free(mail);
+
 	return 0;
 }
 
-int smtp() {
+int smtp(char **p, int n) {
 	CURL *curl;
 	CURLcode res;
 	FILE *fptr;
 	struct curl_slist *http_header = NULL;
 
-	if ((fptr = fopen(FILENAME, "w")) == NULL) {
+	if ((fptr = fopen(FILENAME, "a")) == NULL) {
 		fprintf(stderr, "fopen file error: %s\n", FILENAME);
-		exit(1);
+		exit(-1);
 	}
 
 	curl = curl_easy_init();
@@ -597,21 +600,62 @@ int smtp() {
 	res = curl_easy_perform(curl);
 	if(res != 0)
 	{
-		sendmail();
+		int i=0;
+		for(i=0;i<n;i++)
+		{
+			sendmail(p[i]);
+		}
 	}
 	fclose(fptr);
 	curl_easy_cleanup(curl);
 	return 0;
 }
 
+char * setmail(char *p)
+{
+	char *mailaddr;
+	mailaddr = (char *)malloc(1024);
+	bzero(mailaddr,1024);
+	mailaddr=p;
+	return mailaddr;
+}
+
 int main(int argc, char** argv)
 {
-	while(1)
+	char *configfile;
+	configfile=argv[1];
+
+	char strline[1024];
+	bzero(strline,1024);
+
+	if (argc < 2)
 	{
-		smtp();
-		sleep(1800);
+		fprintf(stderr,"Usage: <To Path config>\n");
+		exit(-1);
 	}
 
+	FILE *fp;
+	if ((fp = fopen(configfile, "r")) == NULL) {
+		fprintf(stderr, "fopen config file error: %s\n", FILENAME);
+		exit(-1);
+	}
+	
+	int n=0;
+	char *mails[100];
+	while(fgets(strline,1024,fp))
+	{
+		strline[strlen(strline)-1]='\0';
+		mails[n]=setmail(strline);
+		n++;
+	}
+
+	fclose(fp);
+	int i=0;
+	while(1)
+	{
+		smtp(mails,n);
+		sleep(1800);
+	}
 	return 0;
 }
 
