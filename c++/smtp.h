@@ -1,8 +1,3 @@
-/*
- * 2013-9-10:build by ken <http://kenchowcn.com>
- *
- */
-
 int debug = 0;
 
 #define NONEED_SELECT     1
