@@ -1,9 +1,3 @@
-/*
- * 2013-9-10:build by ken <http://kenchowcn.com>
- *
- */
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
