@@ -1,0 +1,11 @@
+SMTP命令不区分大小写，但参数区分大小写，有关这方面的详细说明请参考RFC821。常用的命令如下。
+HELO <domain> <CRLF>。向服务器标识用户身份发送者能欺骗，说谎，但一般情况下服务器都能检测到。
+MAIL FROM: <reverse-path> <CRLF>。<reverse-path>为发送者地址，此命令用来初始化邮件传输，即用来对所有的状态和缓冲区进行初始化。
+RCPT TO：<forward-path> <CRLF>。　<forward-path>用来标志邮件接收者的地址，常用在MAIL FROM后，可以有多个RCPT TO。
+DATA <CRLF>。将之后的数据作为数据发送，以<CRLF>.<CRLF>标志数据的结尾。
+REST <CRLF>。重置会话，当前传输被取消。
+NOOP <CRLF>。要求服务器返回OK应答，一般用作测试。
+QUIT <CRLF>。结束会话。
+VRFY <string> <CRLF>。验证指定的邮箱是否存在，由于安全方面的原因，服务器大多禁止此命令。
+EXPN <string> <CRLF>。验证给定的邮箱列表是否存在，由于安全方面的原因，服务器大多禁止此命令。
+HELP <CRLF>。查询服务器支持什么命令。
